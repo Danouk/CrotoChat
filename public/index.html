@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Crotochat Danouk</title>
+  <!-- Insert these scripts at the bottom of the HTML, but before you use any Firebase services -->
+
+  <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+  <script src="https://www.gstatic.com/firebasejs/8.2.6/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.2.6/firebase-database.js"></script>
+
+
+  <!-- If you enabled Analytics in your project, add the Firebase SDK for Analytics -->
+  <script src="https://www.gstatic.com/firebasejs/8.2.6/firebase-analytics.js"></script>
+
+  <!-- Add Firebase products that you want to use -->
+  <script src="https://www.gstatic.com/firebasejs/8.2.6/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.2.6/firebase-firestore.js"></script>
+
+    <style media="screen">
+      .off{
+        display: none;
+      }
+      .redondo{
+        border-radius: 50%;
+        width: 200px;
+      }
+      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; text-align: center; }
+      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
+      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
+      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
+      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
+      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
+      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
+      @media (max-width: 600px) {
+        body, #message { margin-top: 0; background: white; box-shadow: none; }
+        body { border-top: 16px solid #ffa100; }
+      }
+      #mensajes{
+        text-align: left;
+        list-style: none;
+        height: 200px;
+        overflow: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="message">
+      <img id="pic" src="https://lh3.googleusercontent.com/proxy/Q43MOyePLU0xRokpIJp1VZ5oSvpRRrtBzHvcZat7yu0IW7YJ-MBIhBt9Ddmy-r4jb2J_x3Gu_-KWUpddO2iA_8_WPnDaDNIEZRr9k8ywj-2v54sWgrDkvw" alt="" class="redondo">
+      <h2 id="name">¡ Hola ! 🙌</h2>
+      <p id="email"> Esto es crotochat de danouk. 👩🏼‍💻 </p>
+      <a target="_blank" id="login">Entrar</a>
+      <a target="_blank" id="logout" style="display: none;">Salir</a>
+
+      <div id="messageContenedor" style="display: none;">
+        <ul id="mensajes">
+          <!-- <li><strong>Name: </strong>Hola</li> -->
+        </ul>
+        <input type="text" id="msj" placeholder="escribi tu crotochat...">
+        <button id="push" >Enviar</button>
+      </div>
+
+    </div>
+    <p id="load"> Aprendiendo firebase #escuelaDevRock</p>
+
+    <script>
+
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+      apiKey: "AIzaSyA6syHt66NyAavL-6LApL5x_CdvHkwM6D4",
+      authDomain: "crotochat-danouk.firebaseapp.com",
+      projectId: "crotochat-danouk",
+      storageBucket: "crotochat-danouk.appspot.com",
+      messagingSenderId: "471221149347",
+      appId: "1:471221149347:web:b02b61c797661dfcdee916",
+      measurementId: "G-4G1PFG6RSD"
+    };
+
+    firebase.initializeApp(firebaseConfig)
+
+    let off = document.getElementById('logout')
+    let btn = document.getElementById('login')
+    let nameUs = document.getElementById('name')
+    let picUs = document.getElementById('pic')
+    let emailUs = document.getElementById('email')
+    let pushmsj = document.getElementById('push')
+    let msj = document.getElementById('msj')    
+    let mensajes = document.getElementById('mensajes')
+    let messageContenedor = document.getElementById('messageContenedor')
+
+
+
+    pushmsj.addEventListener('click', (e)=>{
+      e.preventDefault()
+      guardarMsj()
+    })
+
+    off.addEventListener('click', (e)=>{
+      deslogear()
+      
+    })
+
+    btn.addEventListener('click', (e)=>{
+      logearConGoogle()
+    })
+
+    let usuario = {}
+
+    function logearConGoogle(){
+      const provider = new firebase.auth.GoogleAuthProvider()
+      firebase.auth().signInWithPopup(provider).then(result => {
+        usuario = result
+        console.log('usuario', usuario)
+        lokearUs()
+      }).catch(error=>console.log(error.message))
+      console.log('funcionando desde google')
+
+    }
+
+    function deslokearUs(){
+      btn.style.display = 'block' 
+      off.style.display = 'none'
+      nameUs.innerHTML = "¡ Hola ! 🙌"
+      emailUs.innerHTML = "Esto es crotochat de danouk. 👩🏼‍💻 "
+      picUs.src = "https://lh3.googleusercontent.com/proxy/Q43MOyePLU0xRokpIJp1VZ5oSvpRRrtBzHvcZat7yu0IW7YJ-MBIhBt9Ddmy-r4jb2J_x3Gu_-KWUpddO2iA_8_WPnDaDNIEZRr9k8ywj-2v54sWgrDkvw"
+      messageContenedor.style.display = 'none'
+
+    }
+
+    function lokearUs(){
+      btn.style.display = 'none' 
+      off.style.display = 'block'
+      nameUs.innerHTML = usuario.user.displayName
+      emailUs.innerHTML = usuario.user.email
+      picUs.src = usuario.user.photoURL
+      messageContenedor.style.display = 'block'
+      mostrame()
+    }
+
+    document.addEventListener('DOMContentLoaded', ()=>{
+      console.log('la pagina cargo')
+      firebase.auth().onAuthStateChanged(user=>{
+        if (user){
+          usuario = {"user": user}
+          lokearUs()
+        }
+      })
+    })
+
+    function deslogear(){
+      firebase.auth().signOut().then(function (){
+        while (mensajes.hasChildNodes()) {
+        mensajes.removeChild(mensajes.firstChild)}
+        deslokearUs()
+      }).catch(error =>(console.log(error.message)))
+    }
+
+    function guardarMsj(){
+      const record ={
+        avatar:usuario.user.photoURL,
+        name: usuario.user.displayName,
+        txt: msj.value
+      }
+
+      const db = firebase.database()
+      const dbRef = db.ref("msj")
+      const newMsj = dbRef.push()
+      newMsj.set(record)
+
+      msj.value = ''
+    }
+
+    function mostrame(){
+      const db = firebase.database()
+      const dbRef = db.ref("msj")
+      dbRef.on("child_added", snapshot =>{
+        var item = document.createElement('li')
+        item.innerHTML = '<strong>'+snapshot.val().name +'</strong>: ' + snapshot.val().txt
+        mensajes.appendChild(item)
+
+        let items2 = document.querySelectorAll('li')
+        let last = items2[items2.length-1]
+        last.scrollIntoView()
+      })
+    }
+
+
+    </script>
+  </body>
+</html>
